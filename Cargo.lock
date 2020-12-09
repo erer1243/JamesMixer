@@ -533,8 +533,6 @@ dependencies = [
  "imgui-glium-renderer",
  "imgui-winit-support",
  "jack",
- "libpulse-binding",
- "libpulse-simple-binding",
  "minimp3",
  "rayon",
 ]
@@ -596,53 +594,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1090080fe06ec2648d0da3881d9453d97e71a45f00eb179af7fdd7e3f686fdb0"
 dependencies = [
  "cfg-if 1.0.0",
- "winapi 0.3.9",
-]
-
-[[package]]
-name = "libpulse-binding"
-version = "2.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe925a4d3a96961316c9c1488f97a95938a6093f0d4691eec888776057ce965e"
-dependencies = [
- "libc",
- "libpulse-sys",
- "num-derive",
- "num-traits",
- "winapi 0.3.9",
-]
-
-[[package]]
-name = "libpulse-simple-binding"
-version = "2.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a047f4502997eed57b3e9d8e71f2b860da91a20bb7e15c65d1f183a7b4fb1226"
-dependencies = [
- "libpulse-binding",
- "libpulse-simple-sys",
- "libpulse-sys",
-]
-
-[[package]]
-name = "libpulse-simple-sys"
-version = "1.15.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b72cb239bc4de6858fa0bbad27419e72cd4466f079ca56f21d94b0a712ab02e"
-dependencies = [
- "libpulse-sys",
- "pkg-config",
-]
-
-[[package]]
-name = "libpulse-sys"
-version = "1.15.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d9073c83dda6aff9b611dc368e8db6e0aa29027546d8800a18b4417e182b4d5"
-dependencies = [
- "libc",
- "num-derive",
- "num-traits",
- "pkg-config",
  "winapi 0.3.9",
 ]
 
@@ -859,17 +810,6 @@ dependencies = [
  "cfg-if 0.1.10",
  "libc",
  "void",
-]
-
-[[package]]
-name = "num-derive"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "876a53fff98e03a936a674b29568b0e605f06b29372c2489ff4de23f1949743d"
-dependencies = [
- "proc-macro2 1.0.24",
- "quote 1.0.7",
- "syn",
 ]
 
 [[package]]

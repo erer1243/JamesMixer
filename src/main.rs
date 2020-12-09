@@ -1,10 +1,9 @@
 mod audio;
 mod ui;
 
-use glium::glutin;
-use glium::glutin::event::{Event, WindowEvent};
-use glium::glutin::event_loop::ControlFlow;
-use glium::Surface;
+use glium::{glutin, Surface};
+use glutin::event::{Event, WindowEvent};
+use glutin::event_loop::ControlFlow;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
@@ -45,7 +44,7 @@ fn main() {
     // Setup enlarged font size
     imgui.fonts().clear();
     imgui.fonts().add_font(&[imgui::FontSource::TtfData {
-        data: &std::fs::read("OpenSans-Semibold.ttf").unwrap(),
+        data: &std::fs::read("font.ttf").unwrap(),
         size_pixels: 22.,
         config: None,
     }]);
