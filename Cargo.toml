@@ -9,8 +9,6 @@ edition = "2018"
 [dependencies]
 # Audio
 minimp3 = "0.5"
-# libpulse-binding = { version = "2.0", default_features = false, features = ["pa_v8"] }
-# libpulse-simple-binding = { version = "2.0", default_features = false, features = ["pa_v8"] }
 jack = "0.6"
 
 # Visual

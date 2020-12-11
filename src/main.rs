@@ -61,10 +61,12 @@ fn main() {
     // =============================================================================================
     let mut ui_state = ui::UIState {
         window_size: [0.; 2],
-        mic_volume: 0.0,
-        phone_volume: 0.0,
-        music_volume: 0.0,
-        current_song: 0,
+        mic_volume: 10.,
+        line_volume: 10.,
+        song_volume: 10.,
+        selected_song: 0,
+        jump_time: [0; 2],
+        loaded_song: imgui::ImString::new("Load song below"),
     };
 
     // Previous frame (pf) start time

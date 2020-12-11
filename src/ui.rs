@@ -1,3 +1,4 @@
+use crate::audio::{Audio, Source};
 use imgui::*;
 
 pub struct UIState {
@@ -6,14 +7,20 @@ pub struct UIState {
 
     // The percentage volume (0-100) of the 3 inputs
     pub mic_volume: f32,
-    pub phone_volume: f32,
-    pub music_volume: f32,
+    pub line_volume: f32,
+    pub song_volume: f32,
 
-    // Currently selected song
-    pub current_song: i32,
+    // Currently selected song list index
+    pub selected_song: i32,
+
+    // Jump-to-time target
+    pub jump_time: [i32; 2],
+
+    // Currently loaded song name
+    pub loaded_song: ImString,
 }
 
-pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &crate::audio::Audio) {
+pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &Audio) {
     Window::new(im_str!("main window"))
         // Disable window title, scrollbar etc
         .no_decoration()
@@ -24,6 +31,8 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &crate::audio::Au
         .draw_background(false)
         // Content within ui
         .build(ui, || {
+            // Top labels
+            // =====================================================================================
             // 2 Columns for 2 labels
             ui.columns(2, im_str!("##Labels"), false);
             ui.text("Volume Adjustment:");
@@ -32,47 +41,122 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &crate::audio::Au
 
             ui.separator();
 
-            // 3 columns for 3 input sources
-            ui.columns(4, im_str!("##Inputs"), false);
+            // Volume columns
+            // =====================================================================================
+            // 4 columns for 3 input volume + 1 music control column
+            ui.columns(4, im_str!("##Inputs and Controls"), false);
 
             // Microphone volume column
+            // =====================================================================================
             ui.set_current_column_width(150.);
             ui.text("Microphone");
-            VerticalSlider::new(im_str!("##Mic volume"), [100., 300.])
-                .range(0.0..=100.0)
+            let changed = VerticalSlider::new(im_str!("##Mic volume"), [100., 300.])
+                .range(0.0..=125.0)
                 .display_format(im_str!("%.0f%%"))
                 .build(ui, &mut state.mic_volume);
 
+            if changed {
+                audio.set_volume(Source::Mic, state.mic_volume);
+            }
+
             // Phone line volume column
+            // =====================================================================================
             ui.next_column();
             ui.set_current_column_width(150.);
-            ui.text("Phone");
-            VerticalSlider::new(im_str!("##Phone volume"), [100., 300.])
-                .range(0.0..=100.0)
+            ui.text("Line in");
+            let changed = VerticalSlider::new(im_str!("##Line in volume"), [100., 300.])
+                .range(0.0..=125.0)
                 .display_format(im_str!("%.0f%%"))
-                .build(ui, &mut state.phone_volume);
+                .build(ui, &mut state.line_volume);
+
+            if changed {
+                audio.set_volume(Source::Line, state.line_volume);
+            }
 
             // Music volume column
+            // =====================================================================================
             ui.next_column();
             ui.set_current_column_width(150.);
             ui.text("Music");
-            VerticalSlider::new(im_str!("##Music volume"), [100., 300.])
-                .range(0.0..=100.0)
+            let changed = VerticalSlider::new(im_str!("##Music volume"), [100., 300.])
+                .range(0.0..=125.0)
                 .display_format(im_str!("%.0f%%"))
-                .build(ui, &mut state.music_volume);
+                .build(ui, &mut state.song_volume);
+
+            if changed {
+                audio.set_volume(Source::Song, state.song_volume);
+            }
 
             // Music controls column
+            // =====================================================================================
             ui.next_column();
-            ui.button(im_str!("Pause"), [80., 30.]);
+            if ui.button(im_str!("Pause"), [80., 30.]) {
+                audio.pause_music();
+            }
+
             ui.same_line(80. + 3. * ui.clone_style().frame_padding[0]);
-            ui.button(im_str!("Play"), [80., 30.]);
+            if ui.button(im_str!("Play"), [80., 30.]) {
+                audio.unpause_music();
+            }
+
+            // Draw loaded song
+            ui.text("Loaded song:");
+            ui.same_line(
+                ui.calc_text_size(im_str!("Loaded song:"), false, 0.0)[0]
+                    + 3. * ui.clone_style().frame_padding[0],
+            );
+            ui.text(&state.loaded_song);
+
+            // Draw paused/playing
+            ui.text(if audio.music_paused() {
+                "Status: Paused"
+            } else {
+                "Status: Playing"
+            });
+
+            // Draw timestamp
+            let ((ts_m, ts_s), (mt_m, mt_s)) = audio.music_timestamp();
+            ui.text(format!(
+                "Timestamp: {:02}:{:02} / {:02}:{:02}",
+                ts_m, ts_s, mt_m, mt_s
+            ));
+
+            let (samples, max_samples) = audio.music_samples();
+            let (mut samples, max_samples) = (samples as u64, max_samples as u64);
+            Slider::new(im_str!("##Timestamp slider"))
+                .range(0..=max_samples)
+                .display_format(im_str!(""))
+                .build(ui, &mut samples);
+
+            // Draw jump-to-time
+            if ui.button(im_str!("Jump to"), [80., 30.]) && state.jump_time != [0, 0] {
+                audio.jump_song(state.jump_time[0] as usize, state.jump_time[1] as usize);
+                state.jump_time = [0; 2];
+            }
+
+            ui.same_line(80. + 3. * ui.clone_style().frame_padding[0]);
+
+            let width_tok = ui.push_item_width(50.);
+            InputInt2::new(ui, im_str!("##Jump time"), &mut state.jump_time).build();
+            width_tok.pop(ui);
 
             // Music selection box
+            // =====================================================================================
+            let song_list = audio.song_list();
             ui.columns(1, im_str!("##Selection section"), false);
             ui.separator();
             ui.text("Song Selection");
 
-            ui.button(im_str!("Load"), [80., 30.]);
+            // Load song button
+            if ui.button(im_str!("Load"), [80., 30.]) {
+                let song_name = song_list[state.selected_song as usize];
+
+                // Tell audio system to load song
+                audio.load_song(song_name);
+
+                // Display loaded song in controls column
+                state.loaded_song = song_name.to_owned();
+            }
 
             ChildWindow::new(0).build(ui, || {
                 // Setup width for list box
@@ -80,10 +164,9 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &crate::audio::Au
                 let width = state.window_size[0] - xpad;
                 let width_tok = ui.push_item_width(width);
 
-                let song_list = audio.song_list();
                 ui.list_box(
                     im_str!("##Song selector"),
-                    &mut state.current_song,
+                    &mut state.selected_song,
                     song_list.as_slice(),
                     song_list.len() as i32,
                 );

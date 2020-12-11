@@ -1,5 +1,1 @@
-Audio is interleaved - https://en.wikipedia.org/wiki/Interleaving_(data)
-    Looks like that means it will play one channel then the next. Convert using ffmpeg all to mono?
-
-Add timestamp and jump-to-time in ui
-
+all done for now
