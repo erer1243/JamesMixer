@@ -5,7 +5,7 @@ pub struct UIState {
     // The size of the actual window, used to update imgui window size
     pub window_size: [f32; 2],
 
-    // The percentage volume (0-100) of the 3 inputs
+    // The percentage volume (0-100+) of the 3 inputs
     pub mic_volume: f32,
     pub line_volume: f32,
     pub song_volume: f32,

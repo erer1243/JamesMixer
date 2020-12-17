@@ -1,8 +1,8 @@
-pub mod song;
-mod util;
+mod song;
+mod jack_util;
 
 use song::Song;
-use util::{JackBoxProcHandler, JackNotifs};
+use jack_util::{JackBoxProcHandler, JackNotifs};
 
 use imgui::{ImStr, ImString};
 use jack::{AsyncClient, AudioIn, AudioOut, Client, ClientOptions, Control, ProcessScope};
@@ -191,7 +191,7 @@ struct SharedAtomics {
     // True if music is currently paused
     paused: Arc<AtomicBool>,
 
-    // The volume of the three inputs
+    // The coefficient volume (0-1+) of the three inputs
     mic_volume: Arc<AtomicU32>,
     line_volume: Arc<AtomicU32>,
     song_volume: Arc<AtomicU32>,
