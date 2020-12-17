@@ -61,9 +61,9 @@ fn main() {
     // =============================================================================================
     let mut ui_state = ui::UIState {
         window_size: [0.; 2],
-        mic_volume: 10.,
-        line_volume: 10.,
-        song_volume: 10.,
+        mic_volume: 0.,
+        line_volume: 0.,
+        song_volume: 0.,
         selected_song: 0,
         jump_time: [0; 2],
         loaded_song: imgui::ImString::new("Load song below"),
@@ -77,7 +77,7 @@ fn main() {
     event_loop.run(move |event, _, control_flow| match event {
         Event::RedrawRequested(_) => {
             // FPS limiting
-            let min_frame_time = Duration::from_secs_f32(1. / 60.);
+            let min_frame_time = Duration::from_secs_f32(1. / 20.);
             let pf_duration = Instant::now() - pf_start;
             if Instant::now() - pf_start < min_frame_time {
                 sleep(min_frame_time - pf_duration);

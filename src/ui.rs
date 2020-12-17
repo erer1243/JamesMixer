@@ -1,4 +1,4 @@
-use crate::audio::{Audio, Source};
+use crate::audio::Audio;
 use imgui::*;
 
 pub struct UIState {
@@ -56,7 +56,7 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &Audio) {
                 .build(ui, &mut state.mic_volume);
 
             if changed {
-                audio.set_volume(Source::Mic, state.mic_volume);
+                audio.set_mic_volume(state.mic_volume);
             }
 
             // Phone line volume column
@@ -70,7 +70,7 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &Audio) {
                 .build(ui, &mut state.line_volume);
 
             if changed {
-                audio.set_volume(Source::Line, state.line_volume);
+                audio.set_line_volume(state.line_volume);
             }
 
             // Music volume column
@@ -84,19 +84,19 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &Audio) {
                 .build(ui, &mut state.song_volume);
 
             if changed {
-                audio.set_volume(Source::Song, state.song_volume);
+                audio.set_song_volume(state.song_volume);
             }
 
             // Music controls column
             // =====================================================================================
             ui.next_column();
             if ui.button(im_str!("Pause"), [80., 30.]) {
-                audio.pause_music();
+                audio.set_paused(true);
             }
 
             ui.same_line(80. + 3. * ui.clone_style().frame_padding[0]);
             if ui.button(im_str!("Play"), [80., 30.]) {
-                audio.unpause_music();
+                audio.set_paused(false);
             }
 
             // Draw loaded song
@@ -108,7 +108,7 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &Audio) {
             ui.text(&state.loaded_song);
 
             // Draw paused/playing
-            ui.text(if audio.music_paused() {
+            ui.text(if audio.get_paused() {
                 "Status: Paused"
             } else {
                 "Status: Playing"

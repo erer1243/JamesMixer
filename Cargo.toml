@@ -1,6 +1,6 @@
 [package]
 name = "james_mixer"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["user <no email given>"]
 edition = "2018"
 
@@ -19,3 +19,8 @@ glium = "0.27.0"
 
 # Other
 rayon = "1.5"
+
+# Extra optimiaztions
+[profile.release]
+lto = true
+opt-level = 3
