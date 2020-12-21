@@ -93,6 +93,7 @@ impl Audio {
 
         // My setup for the show. In the future this could be read from a file, or deferred
         // to an external script or the user.
+        // jack_capture automatically connects when the port is found, so it is not needed here.
         ports! {
             "system:capture_1" => "JamesMixer:mic_in"
             "system:capture_2" => "JamesMixer:mic_in"
@@ -307,8 +308,14 @@ fn load_songs() -> (BTreeMap<ImString, usize>, Vec<Song>) {
 
     // Load song files from disk
     for f in fs::read_dir("./music").unwrap() {
-        // Grab file metadata
         let f = f.unwrap();
+
+        // Skip non files
+        if !f.file_type().unwrap().is_file() {
+            continue;
+        }
+
+        // Grab file metadata 
         let path = f.path();
         let name = f.file_name();
 
