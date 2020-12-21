@@ -77,7 +77,7 @@ fn main() {
     event_loop.run(move |event, _, control_flow| match event {
         Event::RedrawRequested(_) => {
             // FPS limiting
-            let min_frame_time = Duration::from_secs_f32(1. / 20.);
+            let min_frame_time = Duration::from_secs_f32(1. / 60.);
             let pf_duration = Instant::now() - pf_start;
             if Instant::now() - pf_start < min_frame_time {
                 sleep(min_frame_time - pf_duration);
