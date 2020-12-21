@@ -51,7 +51,8 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &Audio) {
             ui.set_current_column_width(150.);
             ui.text("Microphone");
             let changed = VerticalSlider::new(im_str!("##Mic volume"), [100., 300.])
-                .range(0.0..=125.0)
+                .range(0.0..=500.0)
+                .flags(SliderFlags::LOGARITHMIC)
                 .display_format(im_str!("%.0f%%"))
                 .build(ui, &mut state.mic_volume);
 
@@ -59,13 +60,14 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &Audio) {
                 audio.set_mic_volume(state.mic_volume);
             }
 
-            // Phone line volume column
+            // Line in volume column
             // =====================================================================================
             ui.next_column();
             ui.set_current_column_width(150.);
             ui.text("Line in");
             let changed = VerticalSlider::new(im_str!("##Line in volume"), [100., 300.])
-                .range(0.0..=125.0)
+                .range(0.0..=500.0)
+                .flags(SliderFlags::LOGARITHMIC)
                 .display_format(im_str!("%.0f%%"))
                 .build(ui, &mut state.line_volume);
 
@@ -79,7 +81,8 @@ pub fn draw_ui(ui: &mut imgui::Ui, state: &mut UIState, audio: &Audio) {
             ui.set_current_column_width(150.);
             ui.text("Music");
             let changed = VerticalSlider::new(im_str!("##Music volume"), [100., 300.])
-                .range(0.0..=125.0)
+                .range(0.0..=1000.0)
+                .flags(SliderFlags::LOGARITHMIC)
                 .display_format(im_str!("%.0f%%"))
                 .build(ui, &mut state.song_volume);
 
