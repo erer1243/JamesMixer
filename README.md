@@ -15,6 +15,6 @@ Screenshots of program in use:
 This mixer was used successfully in conjunction with JACK, Icecast2, and 
 DarkIce to broadcast live to hunderds of people on December 21, 2020.
 
-Icecast stats page:
+Icecast stats page at the end of the show:
 <br>![Icecast2 Stats Page](./connections.png)
 
